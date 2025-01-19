@@ -37,6 +37,7 @@ jobs:
 
     terraform-security:
       name: Terraform Security Scan
+      permissions: write-all
       needs: terraform-linting
       runs-on: ubuntu-latest
   

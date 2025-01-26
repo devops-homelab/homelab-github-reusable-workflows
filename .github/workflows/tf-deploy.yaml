@@ -61,9 +61,9 @@ jobs:
       id-token: write
       
     env:
-      AWS_ACCESS_KEY_ID: ${{ inputs.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
-      DO_ACCESS_TOKEN: ${{ inputs.DO_ACCESS_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      DO_ACCESS_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
       ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
       COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
       MODULE: ${{ needs.load-env-vars.outputs.MODULE }}

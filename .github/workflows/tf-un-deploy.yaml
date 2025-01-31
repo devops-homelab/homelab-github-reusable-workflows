@@ -97,4 +97,4 @@ jobs:
       - name: Terragrunt Destroy
         if: ${{ github.event.pull_request.merged == false }}
         run: |
-            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ destroy --terragrunt-non-interactive 
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ destroy --terragrunt-non-interactive -auto-approve 

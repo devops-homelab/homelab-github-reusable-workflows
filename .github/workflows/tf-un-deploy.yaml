@@ -95,6 +95,6 @@ jobs:
     
       # Step 5: Un-deploy with Terragrunt
       - name: Terragrunt Destroy
-        if: ${{ github.event.pull_request.merged == true }}
+        if: ${{ github.event.pull_request.merged == false }}
         run: |
             terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ destroy --terragrunt-non-interactive 

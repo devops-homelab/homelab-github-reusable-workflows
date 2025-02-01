@@ -1,0 +1,99 @@
+name: Deploy with Terragrunt
+
+on:
+  workflow_call:
+    secrets:
+        AWS_ACCESS_KEY_ID:
+            required: true
+            description: 'AWS Access Key ID'
+        AWS_SECRET_ACCESS_KEY:
+            required: true
+            description: 'AWS Secret Access Key'
+        DO_ACCESS_TOKEN: 
+            required: true
+            description: 'DigitalOcean Token'
+    inputs:
+      config_file:
+        description: 'Path to the config file'
+        required: true
+        type: string
+
+jobs:
+  load-env-vars:
+    name: Load Environment Variables
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+
+    outputs:
+      ENVIRONMENT: ${{ steps.load-env.outputs.ENVIRONMENT }}
+      COMPONENT: ${{ steps.load-env.outputs.COMPONENT }}
+      MODULE: ${{ steps.load-env.outputs.MODULE }}
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Load environment variables from file
+      - id: load-env
+        name: Load Environment Variables
+        run: |
+          source ${{ inputs.config_file }}
+          echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
+          echo "COMPONENT=$COMPONENT" >> $GITHUB_ENV
+          echo "MODULE=$MODULE" >> $GITHUB_ENV
+          echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_OUTPUT
+          echo "COMPONENT=$COMPONENT" >> $GITHUB_OUTPUT
+          echo "MODULE=$MODULE" >> $GITHUB_OUTPUT
+
+  terragrunt-deploy:
+    name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}
+    needs: load-env-vars
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+      
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
+      ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
+      COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
+      MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
+
+      # Step 3: Install Terragrunt
+      - name: Install Terragrunt
+        run: |
+          TERRAGRUNT_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r '.tag_name' | sed 's/v//')
+          curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+          chmod +x /usr/local/bin/terragrunt
+
+      # Step 4: Deploy with Terragrunt
+      - name: Terragrunt Plan
+        run: |
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
+    
+      # Step 5: Deploy with Terragrunt
+      - name: Terragrunt Apply
+        run: |
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve

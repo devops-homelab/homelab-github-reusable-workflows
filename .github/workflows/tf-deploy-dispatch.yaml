@@ -96,4 +96,4 @@ jobs:
       # Step 5: Deploy with Terragrunt
       - name: Terragrunt Apply
         run: |
-            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply -refresh=true --terragrunt-non-interactive -auto-approve

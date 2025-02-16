@@ -3,6 +3,12 @@ name: Deploy with Terragrunt
 on:
   workflow_call:
     secrets:
+        AWS_ACCESS_KEY_ID:
+            required: true
+            description: 'AWS Access Key ID'
+        AWS_SECRET_ACCESS_KEY:
+            required: true
+            description: 'AWS Secret Access Key'
         DO_ACCESS_TOKEN: 
             required: true
             description: 'DigitalOcean Token'
@@ -65,6 +71,8 @@ jobs:
       ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
       COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
       MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
       TF_VAR_pat_token: ${{ secrets.ARGOCD_PAT_TOKEN }}
       

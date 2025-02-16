@@ -3,15 +3,15 @@ name: Deploy with Terragrunt
 on:
   workflow_call:
     secrets:
-        AWS_ACCESS_KEY_ID:
-            required: true
-            description: 'AWS Access Key ID'
-        AWS_SECRET_ACCESS_KEY:
-            required: true
-            description: 'AWS Secret Access Key'
         DO_ACCESS_TOKEN: 
             required: true
             description: 'DigitalOcean Token'
+        TF_VAR_git_username:
+            required: false
+            description: 'GIT username for ArgoCD'
+        TF_VAR_pat_token:
+            required: false
+            description: 'GIT PAT for ArgoCD'
     inputs:
       config_file:
         description: 'Path to the config file'
@@ -61,12 +61,13 @@ jobs:
       id-token: write
       
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
       ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
       COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
       MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
+      TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
+      TF_VAR_pat_token: ${{ secrets.ARGOCD_PAT_TOKEN }}
+      
 
     steps:
       # Step 1: Checkout repository

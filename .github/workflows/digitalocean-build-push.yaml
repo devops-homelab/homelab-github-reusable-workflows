@@ -30,11 +30,13 @@ jobs:
 
       # Step 3: Build container image
       - name: Build container image
-        id: build-container
+        id: build-container-image
         run: |
           IMAGE_TAG=$(echo $GITHUB_SHA | head -c3)
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           docker build -t ${{ inputs.registry }}/${{ inputs.image_name }}:$IMAGE_TAG .
+          # Save the IMAGE_TAG into a file
+          echo $IMAGE_TAG > ${{ runner.temp }}/image_tag.txt
 
       # Step 4: Log in to DigitalOcean Container Registry
       - name: Log in to DigitalOcean Container Registry
@@ -45,9 +47,9 @@ jobs:
         run: |
           docker push ${{ inputs.registry }}/${{ inputs.image_name }}:$IMAGE_TAG
 
-      # Step 6: Upload IMAGE_TAG as artifact
-      - name: Upload IMAGE_TAG as artifact
+      # Step 6: Upload IMAGE_TAG artifact
+      - name: Upload IMAGE_TAG artifact
         uses: actions/upload-artifact@v4
         with:
           name: image-tag
-          path: ${{ github.env }}
+          path: ${{ runner.temp }}/image_tag.txt  # Upload the file containing IMAGE_TAG

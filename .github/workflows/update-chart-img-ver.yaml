@@ -1,0 +1,36 @@
+name: Update Helm Chart
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+      service_name:
+        required: true
+        type: string
+
+jobs:
+  update-helm-chart:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout GitOps repository with PAT (passed as secret)
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v3
+        with:
+          repository: devops-homelab/homelab-gitops
+          token: ${{ secrets.PAT_TOKEN }}
+          ref: main
+
+      # Step 2: Update GitOps values.yaml
+      - name: Update GitOps values.yaml
+        run: |
+          IMAGE_TAG=$(echo $GITHUB_SHA | head -c3)
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/app/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values.yaml
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add charts/app/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values.yaml
+          git commit -m "Update ${ { inputs.service_name } } image tag to $IMAGE_TAG"
+          git push origin main

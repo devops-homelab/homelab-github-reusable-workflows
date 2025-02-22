@@ -1,0 +1,42 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        required: true
+        type: string
+      image_name:
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Install doctl
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # Step 3: Build container image
+      - name: Build container image
+        run: |
+          IMAGE_TAG=$(echo $GITHUB_SHA | head -c3)
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          docker build -t ${{ inputs.registry }}/${{ inputs.image_name }}:$IMAGE_TAG .
+
+      # Step 4: Log in to DigitalOcean Container Registry
+      - name: Log in to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 1200
+
+      # Step 5: Push image to DigitalOcean Container Registry
+      - name: Push image to DigitalOcean Container Registry
+        run: |
+          docker push ${{ inputs.registry }}/${{ inputs.image_name }}:$IMAGE_TAG

@@ -26,11 +26,22 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           ref: main
 
-      # Step 2: Update GitOps values.yaml
+      # Step 2: Download IMAGE_TAG artifact
+      - name: Download IMAGE_TAG artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tag
+          path: ${{ runner.temp }}
+
+      # Step 3: Load the IMAGE_TAG from the artifact
+      - name: Set IMAGE_TAG from artifact
+        run: |
+          source ${{ runner.temp }}/image-tag
+          echo "Loaded IMAGE_TAG: $IMAGE_TAG"
+
+      # Step 4: Update GitOps values.yaml
       - name: Update GitOps values.yaml
         run: |
-          IMAGE_TAG=$(echo $GITHUB_SHA | head -c3)
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/app/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"

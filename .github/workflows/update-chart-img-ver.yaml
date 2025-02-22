@@ -2,6 +2,9 @@ name: Update Helm Chart
 
 on:
   workflow_call:
+    secrets:
+      PAT_TOKEN:
+        required: true
     inputs:
       app_name:
         required: true

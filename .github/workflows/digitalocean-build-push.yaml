@@ -38,6 +38,7 @@ jobs:
           # Save the IMAGE_TAG into a file
           echo $IMAGE_TAG > ${{ runner.temp }}/image_tag.txt
 
+      # Step 4: Run Trivy vulnerability scanner
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:

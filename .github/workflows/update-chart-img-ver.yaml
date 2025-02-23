@@ -14,7 +14,7 @@ on:
         type: string
 
 jobs:
-  update-helm-chart:
+  deploy-to-dev:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout GitOps repository with PAT (passed as secret)

@@ -48,8 +48,8 @@ jobs:
           vuln-type: 'os,library'
           format: 'table'
         env:
-          TRIVY_SKIP_DB_UPDATE: true
-          TRIVY_SKIP_JAVA_DB_UPDATE: true
+          TRIVY_SKIP_DB_UPDATE: false
+          TRIVY_SKIP_JAVA_DB_UPDATE: false
 
       # Step 4: Log in to DigitalOcean Container Registry
       - name: Log in to DigitalOcean Container Registry

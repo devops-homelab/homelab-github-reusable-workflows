@@ -49,7 +49,7 @@ jobs:
           git push origin main
 
   promote-to-staging:
-    needs: update-helm-chart
+    needs: deploy-to-dev
     runs-on: ubuntu-latest
     environment: 
       name: staging

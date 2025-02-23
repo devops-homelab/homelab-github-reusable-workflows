@@ -52,4 +52,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: image-tag
-          path: ${{ runner.temp }}/image_tag.txt  # Upload the file containing IMAGE_TAG
+          path: ${{ runner.temp }}/image_tag.txt

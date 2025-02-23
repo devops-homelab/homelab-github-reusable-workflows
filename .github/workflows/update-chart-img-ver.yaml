@@ -51,7 +51,9 @@ jobs:
   promote-to-staging:
     needs: update-helm-chart
     runs-on: ubuntu-latest
-    environment: staging
+    environment: 
+      name: staging
+      url: https://github.com
 
     steps:
       - name: Checkout GitOps repository

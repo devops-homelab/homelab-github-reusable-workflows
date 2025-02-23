@@ -38,6 +38,18 @@ jobs:
           # Save the IMAGE_TAG into a file
           echo $IMAGE_TAG > ${{ runner.temp }}/image_tag.txt
 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'image'
+          image-ref: ${{ inputs.registry }}/${{ inputs.image_name }}:$IMAGE_TAG
+          severity: 'CRITICAL,HIGH'
+          vuln-type: 'os,library'
+          format: 'table'
+        env:
+          TRIVY_SKIP_DB_UPDATE: true
+          TRIVY_SKIP_JAVA_DB_UPDATE: true
+
       # Step 4: Log in to DigitalOcean Container Registry
       - name: Log in to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 1200

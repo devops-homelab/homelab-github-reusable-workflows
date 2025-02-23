@@ -1,4 +1,4 @@
-name: Update Helm Chart
+name: Update Helm Chart with Image Version
 
 on:
   workflow_call:

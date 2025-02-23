@@ -62,7 +62,7 @@ jobs:
 
       - name: Update GitOps values.yaml
         run: |
-          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/app/${{ inputs.app_name }}/ ${{ inputs.service_name }}/values/values-staging.yaml
+          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/app/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values-staging.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add charts/app/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values-staging.yaml

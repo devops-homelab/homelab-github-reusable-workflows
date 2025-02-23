@@ -54,6 +54,13 @@ jobs:
     environment: staging
 
     steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v3
+        with:
+          repository: devops-homelab/homelab-gitops
+          token: ${{ secrets.PAT_TOKEN }}
+          ref: main
+
       - name: Download IMAGE_TAG artifact
         uses: actions/download-artifact@v4
         with:

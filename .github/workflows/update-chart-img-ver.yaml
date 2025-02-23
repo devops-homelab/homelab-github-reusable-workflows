@@ -15,6 +15,7 @@ on:
 
 jobs:
   deploy-to-dev:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout GitOps repository with PAT (passed as secret)
@@ -49,6 +50,7 @@ jobs:
           git push origin main
 
   promote-to-staging:
+    if: github.event.pull_request.merged == true
     needs: deploy-to-dev
     runs-on: ubuntu-latest
     environment: 

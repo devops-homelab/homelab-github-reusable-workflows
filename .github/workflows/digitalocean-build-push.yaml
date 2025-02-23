@@ -53,15 +53,18 @@ jobs:
 
       # Step 4: Log in to DigitalOcean Container Registry
       - name: Log in to DigitalOcean Container Registry
+        if: github.event.pull_request.merged == true
         run: doctl registry login --expiry-seconds 1200
 
       # Step 5: Push image to DigitalOcean Container Registry
       - name: Push image to DigitalOcean Container Registry
+        if: github.event.pull_request.merged == true
         run: |
           docker push ${{ inputs.registry }}/${{ inputs.image_name }}:$IMAGE_TAG
 
       # Step 6: Upload IMAGE_TAG artifact
       - name: Upload IMAGE_TAG artifact
+        if: github.event.pull_request.merged == true
         uses: actions/upload-artifact@v4
         with:
           name: image-tag

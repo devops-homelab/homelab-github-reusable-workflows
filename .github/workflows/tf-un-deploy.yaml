@@ -12,6 +12,12 @@ on:
         DO_ACCESS_TOKEN: 
             required: true
             description: 'DigitalOcean Token'
+        TF_VAR_git_username:
+            required: false
+            description: 'GIT username for ArgoCD'
+        TF_VAR_pat_token:
+            required: false
+            description: 'GIT PAT for ArgoCD'
     inputs:
       config_file:
         description: 'Path to the config file'
@@ -67,6 +73,8 @@ jobs:
       ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
       COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
       MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
+      TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
+      TF_VAR_pat_token: ${{ secrets.TF_VAR_pat_token }}
 
     steps:
       # Step 1: Checkout repository

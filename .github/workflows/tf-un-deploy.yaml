@@ -18,6 +18,12 @@ on:
         TF_VAR_pat_token:
             required: false
             description: 'GIT PAT for ArgoCD'
+        TF_VAR_sso_client_id:
+            required: false
+            description: 'SSO Client ID for ArgoCD'
+        TF_VAR_sso_client_secret:
+            required: false
+            description: 'SSO Client Secret'
     inputs:
       config_file:
         description: 'Path to the config file'
@@ -75,6 +81,8 @@ jobs:
       MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
       TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
       TF_VAR_pat_token: ${{ secrets.TF_VAR_pat_token }}
+      TF_VAR_sso_client_id: ${{ secrets.TF_VAR_sso_client_id }}
+      TF_VAR_sso_client_secret: ${{ secrets.TF_VAR_sso_client_secret }}
 
     steps:
       # Step 1: Checkout repository

@@ -19,8 +19,6 @@ jobs:
   release:
     name: Release
     runs-on: homelab-runner
-    permissions:
-      contents: write
 
     steps:           
     - name: Checkout

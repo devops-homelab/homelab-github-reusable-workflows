@@ -54,8 +54,7 @@ jobs:
         kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
     - name: Wait for Argo Rollouts to be ready
       run: |
-        kubectl wait --for=condition=available --timeout=120s deployment/argo-rollouts-dashboard -n argo-rollouts || true
-        kubectl wait --for=condition=available --timeout=120s deployment/argo-rollouts-controller -n argo-rollouts
+        kubectl wait --for=condition=available --timeout=120s deployment/argo-rollouts -n argo-rollouts
     - name: Run chart-testing (install)
       if: steps.list-changed.outputs.changed == 'true'    
       run: ct install --config .github/configs/ct.yaml

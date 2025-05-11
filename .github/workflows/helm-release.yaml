@@ -63,6 +63,7 @@ jobs:
     - name: Copy Package Files to gh-pages
       shell: bash
       run: |
+        ls -la
         cp .cr-release-packages/* gh-pages/
 
     - name: Push Package Files to gh-pages

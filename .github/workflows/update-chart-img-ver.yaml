@@ -42,7 +42,7 @@ jobs:
       # Step 4: Update GitOps values.yaml
       - name: Update GitOps values.yaml
         run: |
-          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values-dev.yaml
+          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values-dev.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values-dev.yaml
@@ -78,7 +78,7 @@ jobs:
 
       - name: Update GitOps values.yaml
         run: |
-          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values-staging.yaml
+          sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values-staging.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values-staging.yaml

@@ -81,6 +81,6 @@ jobs:
           sed -i "s|tag:.*|tag: $IMAGE_TAG|" charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values-staging.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values/values-staging.yaml
+          git add charts/apps/${{ inputs.app_name }}/${{ inputs.service_name }}/values-staging.yaml
           git commit -m "Update ${{ inputs.service_name }} image tag to $IMAGE_TAG"
           git push origin main

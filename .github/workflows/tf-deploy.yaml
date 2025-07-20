@@ -95,7 +95,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TF_VAR_pat_token }}
 
       - name: Run TFLint
-        run: tflint --recursive --color --force -f compact
+        run: tflint --chdir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ --recursive --color --force -f compact
         env:
           GITHUB_TOKEN: ${{ secrets.TF_VAR_pat_token }}
 

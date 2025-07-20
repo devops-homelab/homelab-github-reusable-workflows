@@ -100,41 +100,41 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TF_VAR_pat_token }}
 
-  # terraform-security:
-  #   name: Terraform Security Scan
-  #   needs: terraform-linting
-  #   runs-on: ubuntu-latest
+  infra-security:
+    name: Terraform Security Scan
+    needs: infra-linting
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       name: Checkout source code
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout source code
 
-  #     - name: Setup tfsec
-  #       uses: aquasecurity/tfsec-sarif-action@v0.1.4
-  #       with:
-  #         sarif_file: tfsec.sarif
-  #         working_directory: ${{ inputs.working_directory}}
-  #         full_repo_scan: true
+      - name: Setup tfsec
+        uses: aquasecurity/tfsec-sarif-action@v0.1.4
+        with:
+          sarif_file: tfsec.sarif
+          working_directory: live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/
+          full_repo_scan: true
 
-  #     - name: Upload SARIF file
-  #       uses: github/codeql-action/upload-sarif@v3
-  #       with:
-  #         sarif_file: tfsec.sarif
-  #       continue-on-error: true
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: tfsec.sarif
+        continue-on-error: true
 
-  #     - name: tfsec commenter for PR
-  #       uses: tfsec/tfsec-pr-commenter-action@v1.3.1
-  #       with:
-  #         github_token: ${{ secrets.GITHUB_PAT }}
-  #         working_directory: ${{ inputs.working_directory}}
+      - name: tfsec commenter for PR
+        uses: tfsec/tfsec-pr-commenter-action@v1.3.1
+        with:
+          github_token: ${{ secrets.GITHUB_PAT }}
+          working_directory: live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/
 
-  #     - name: Terraform security scan Advanced
-  #       uses: triat/terraform-security-scan@v3.2.0
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
-  #         tfsec_actions_comment: true
-  #         tfsec_output_format: sarif
-  #       continue-on-error: true
+      - name: Terraform security scan Advanced
+        uses: triat/terraform-security-scan@v3.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+          tfsec_actions_comment: true
+          tfsec_output_format: sarif
+        continue-on-error: true
 
   # terragrunt-deploy:
   #   name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}

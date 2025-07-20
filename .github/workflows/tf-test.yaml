@@ -25,10 +25,6 @@ on:
             required: false
             description: 'SSO Client'
     inputs:
-      config_file:
-        description: 'Path to the config file'
-        required: true
-        type: string
       working_directory:
         description: 'Directory where main.tf exist of the module.'
         required: false

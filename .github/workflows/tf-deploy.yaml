@@ -29,6 +29,10 @@ on:
         description: 'Path to the config file'
         required: true
         type: string
+      working_directory:
+        description: 'Directory where main.tf exist of the module.'
+        required: true
+        type: string
 
 jobs:
   load-env-vars:
@@ -62,56 +66,124 @@ jobs:
           echo "COMPONENT=$COMPONENT" >> $GITHUB_OUTPUT
           echo "MODULE=$MODULE" >> $GITHUB_OUTPUT
 
-  terragrunt-deploy:
-    name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}
-    needs: load-env-vars
+  infra-linting:
+    name: Terraform Linting
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
       pull-requests: read
       id-token: write
-      
-    env:
-      DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
-      ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
-      COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
-      MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
-      TF_VAR_pat_token: ${{ secrets.TF_VAR_pat_token }}
-      TF_VAR_sso_client_id: ${{ secrets.TF_VAR_sso_client_id }}
-      TF_VAR_sso_client_secret: ${{ secrets.TF_VAR_sso_client_secret }}
-      
+
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        name: Checkout source code
 
-      # Step 2: Set up Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+      - uses: terraform-linters/setup-tflint@v4
+        name: Setup TFLint
         with:
-          terraform_version: 1.10.5
-          terraform_wrapper: false
+          tflint_version: v0.44.1
+          github_token: ${{ secrets.TF_VAR_pat_token }}
 
-      # Step 3: Install Terragrunt
-      - name: Install Terragrunt
-        run: |
-          TERRAGRUNT_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r '.tag_name' | sed 's/v//')
-          curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
-          chmod +x /usr/local/bin/terragrunt
+      - name: Show version
+        run: tflint --version
 
-      # Step 4: Deploy with Terragrunt
-      - name: Terragrunt Plan
-        if: ${{ github.event.pull_request.merged == false }}
-        run: |
-            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
-            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ secrets.TF_VAR_pat_token }}
+
+      - name: Run TFLint
+        run: tflint --recursive --color --force -f compact
+        env:
+          GITHUB_TOKEN: ${{ secrets.TF_VAR_pat_token }}
+
+  # terraform-security:
+  #   name: Terraform Security Scan
+  #   needs: terraform-linting
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       name: Checkout source code
+
+  #     - name: Setup tfsec
+  #       uses: aquasecurity/tfsec-sarif-action@v0.1.4
+  #       with:
+  #         sarif_file: tfsec.sarif
+  #         working_directory: ${{ inputs.working_directory}}
+  #         full_repo_scan: true
+
+  #     - name: Upload SARIF file
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       with:
+  #         sarif_file: tfsec.sarif
+  #       continue-on-error: true
+
+  #     - name: tfsec commenter for PR
+  #       uses: tfsec/tfsec-pr-commenter-action@v1.3.1
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_PAT }}
+  #         working_directory: ${{ inputs.working_directory}}
+
+  #     - name: Terraform security scan Advanced
+  #       uses: triat/terraform-security-scan@v3.2.0
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+  #         tfsec_actions_comment: true
+  #         tfsec_output_format: sarif
+  #       continue-on-error: true
+
+  # terragrunt-deploy:
+  #   name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}
+  #   needs: load-env-vars
+  #   runs-on: ubuntu-latest
+
+  #   permissions:
+  #     contents: read
+  #     pull-requests: read
+  #     id-token: write
+      
+  #   env:
+  #     DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
+  #     ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
+  #     COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
+  #     MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
+  #     TF_VAR_pat_token: ${{ secrets.TF_VAR_pat_token }}
+  #     TF_VAR_sso_client_id: ${{ secrets.TF_VAR_sso_client_id }}
+  #     TF_VAR_sso_client_secret: ${{ secrets.TF_VAR_sso_client_secret }}
+      
+  #   steps:
+  #     # Step 1: Checkout repository
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+
+  #     # Step 2: Set up Terraform
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v2
+  #       with:
+  #         terraform_version: 1.10.5
+  #         terraform_wrapper: false
+
+  #     # Step 3: Install Terragrunt
+  #     - name: Install Terragrunt
+  #       run: |
+  #         TERRAGRUNT_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r '.tag_name' | sed 's/v//')
+  #         curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+  #         chmod +x /usr/local/bin/terragrunt
+
+  #     # Step 4: Deploy with Terragrunt
+  #     - name: Terragrunt Plan
+  #       if: ${{ github.event.pull_request.merged == false }}
+  #       run: |
+  #           terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
+  #           terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
     
-      # Step 5: Deploy with Terragrunt
-      - name: Terragrunt Apply
-        if: ${{ github.event.pull_request.merged == true }}
-        run: |
-            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve
+  #     # Step 5: Deploy with Terragrunt
+  #     - name: Terragrunt Apply
+  #       if: ${{ github.event.pull_request.merged == true }}
+  #       run: |
+  #           terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve

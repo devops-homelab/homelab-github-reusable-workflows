@@ -136,56 +136,56 @@ jobs:
           tfsec_output_format: sarif
         continue-on-error: false
 
-  # terragrunt-deploy:
-  #   name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}
-  #   needs: load-env-vars
-  #   runs-on: ubuntu-latest
+  terragrunt-deploy:
+    name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}
+    needs: infra-security
+    runs-on: ubuntu-latest
 
-  #   permissions:
-  #     contents: read
-  #     pull-requests: read
-  #     id-token: write
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
       
-  #   env:
-  #     DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
-  #     ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
-  #     COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
-  #     MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
-  #     TF_VAR_pat_token: ${{ secrets.TF_VAR_pat_token }}
-  #     TF_VAR_sso_client_id: ${{ secrets.TF_VAR_sso_client_id }}
-  #     TF_VAR_sso_client_secret: ${{ secrets.TF_VAR_sso_client_secret }}
+    env:
+      DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
+      ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
+      COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
+      MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
+      TF_VAR_pat_token: ${{ secrets.TF_VAR_pat_token }}
+      TF_VAR_sso_client_id: ${{ secrets.TF_VAR_sso_client_id }}
+      TF_VAR_sso_client_secret: ${{ secrets.TF_VAR_sso_client_secret }}
       
-  #   steps:
-  #     # Step 1: Checkout repository
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v3
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-  #     # Step 2: Set up Terraform
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: 1.10.5
-  #         terraform_wrapper: false
+      # Step 2: Set up Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
 
-  #     # Step 3: Install Terragrunt
-  #     - name: Install Terragrunt
-  #       run: |
-  #         TERRAGRUNT_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r '.tag_name' | sed 's/v//')
-  #         curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
-  #         chmod +x /usr/local/bin/terragrunt
+      # Step 3: Install Terragrunt
+      - name: Install Terragrunt
+        run: |
+          TERRAGRUNT_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r '.tag_name' | sed 's/v//')
+          curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+          chmod +x /usr/local/bin/terragrunt
 
-  #     # Step 4: Deploy with Terragrunt
-  #     - name: Terragrunt Plan
-  #       if: ${{ github.event.pull_request.merged == false }}
-  #       run: |
-  #           terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
-  #           terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
+      # Step 4: Deploy with Terragrunt
+      - name: Terragrunt Plan
+        if: ${{ github.event.pull_request.merged == false }}
+        run: |
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
     
-  #     # Step 5: Deploy with Terragrunt
-  #     - name: Terragrunt Apply
-  #       if: ${{ github.event.pull_request.merged == true }}
-  #       run: |
-  #           terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve
+      # Step 5: Deploy with Terragrunt
+      - name: Terragrunt Apply
+        if: ${{ github.event.pull_request.merged == true }}
+        run: |
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve

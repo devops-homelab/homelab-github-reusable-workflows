@@ -31,9 +31,7 @@ on:
         type: string
 
 jobs:
-  
   load-env-vars:
-    if: github.event.pull_request.merged == false && github.event_name == 'pull_request'
     name: Load Environment Variables
     runs-on: ubuntu-latest
 

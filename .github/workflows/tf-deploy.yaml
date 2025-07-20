@@ -31,7 +31,7 @@ on:
         type: string
       working_directory:
         description: 'Directory where main.tf exist of the module.'
-        required: true
+        required: false
         type: string
 
 jobs:

@@ -134,7 +134,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TF_VAR_pat_token }}
           tfsec_actions_comment: true
           tfsec_output_format: sarif
-        continue-on-error: true
+        continue-on-error: false
 
   # terragrunt-deploy:
   #   name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}

@@ -138,7 +138,7 @@ jobs:
 
   terragrunt-deploy:
     name: Terragrunt Deploy - ${{ needs.load-env-vars.outputs.COMPONENT }}/${{ needs.load-env-vars.outputs.MODULE }}
-    needs: infra-security
+    needs: [load-env-vars, infra-linting, infra-security]
     runs-on: ubuntu-latest
 
     permissions:

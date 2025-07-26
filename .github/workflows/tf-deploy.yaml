@@ -102,7 +102,7 @@ jobs:
 
   infra-security:
     name: Terraform Security Scan
-    needs: infra-linting
+    needs: [load-env-vars, infra-linting]
     runs-on: ubuntu-latest
 
     steps:

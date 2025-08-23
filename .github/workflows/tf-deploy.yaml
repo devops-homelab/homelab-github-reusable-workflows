@@ -181,7 +181,7 @@ jobs:
       - name: Terragrunt Plan
         if: ${{ github.event.pull_request.merged == false }}
         run: |
-            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --reconfigure --terragrunt-non-interactive
+            terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
             terragrunt --terragrunt-working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
 
       # Step 5: Deploy with Terragrunt

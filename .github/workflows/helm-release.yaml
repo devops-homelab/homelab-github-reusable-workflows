@@ -18,7 +18,7 @@ env:
 jobs:
   release:
     name: Release
-    runs-on: homelab-runner
+    runs-on: ubuntu-latest
 
     steps:           
     - name: Checkout

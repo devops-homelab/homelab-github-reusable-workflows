@@ -177,17 +177,11 @@ jobs:
           curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod +x /usr/local/bin/terragrunt
 
-      - name: List Terraform State
-        run: aws --profile do-tor1 s3 ls s3://homelab-terraform-state
-
       # Step 4: Deploy with Terragrunt
       - name: Terragrunt Plan
         if: ${{ github.event.pull_request.merged == false }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
         run: |
-            terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --reconfigure --terragrunt-non-interactive
+            terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --terragrunt-non-interactive
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
 
       # Step 5: Deploy with Terragrunt

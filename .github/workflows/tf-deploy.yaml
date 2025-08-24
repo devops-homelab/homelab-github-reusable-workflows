@@ -181,12 +181,12 @@ jobs:
       # Step 4: Deploy with Terragrunt
       - name: Terragrunt Plan
         if: ${{ github.event.pull_request.merged == false }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ env.DO_SPACES_SECRET_ACCESS_KEY }}
         run: |
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --reconfigure --terragrunt-non-interactive
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
-        with:
-            AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_ACCESS_KEY }}
 
       # Step 5: Deploy with Terragrunt
       - name: Terragrunt Apply

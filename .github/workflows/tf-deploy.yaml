@@ -151,7 +151,6 @@ jobs:
       ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
       COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}
       MODULE: ${{ needs.load-env-vars.outputs.MODULE }}
-      # Use DigitalOcean Spaces credentials for Terraform backend
       AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_ACCESS_KEY }}
       TF_VAR_git_username: ${{ secrets.TF_VAR_git_username }}
@@ -178,15 +177,22 @@ jobs:
           curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod +x /usr/local/bin/terragrunt
 
+
       # Step 4: Deploy with Terragrunt
       - name: Terragrunt Plan
         if: ${{ github.event.pull_request.merged == false }}
         run: |
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ init --reconfigure --terragrunt-non-interactive
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ plan --terragrunt-non-interactive
+        with:
+            AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_ACCESS_KEY }}
 
       # Step 5: Deploy with Terragrunt
       - name: Terragrunt Apply
         if: ${{ github.event.pull_request.merged == true }}
         run: |
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve
+        with:
+            AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_ACCESS_KEY }}

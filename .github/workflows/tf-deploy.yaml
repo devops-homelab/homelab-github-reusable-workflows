@@ -193,6 +193,3 @@ jobs:
         if: ${{ github.event.pull_request.merged == true }}
         run: |
             terragrunt --working-dir live/${{ env.ENVIRONMENT }}/${{ env.COMPONENT }}/${{ env.MODULE }}/ apply --terragrunt-non-interactive -auto-approve
-        with:
-            AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_ACCESS_KEY }}

@@ -76,6 +76,8 @@ jobs:
       # Use DigitalOcean Spaces credentials for Terraform backend
       AWS_ACCESS_KEY_ID: ${{ secrets.DO_SPACES_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DO_SPACES_SECRET_ACCESS_KEY }}
+      AWS_PROFILE: ""
+      AWS_SDK_LOAD_CONFIG: "false"
       DIGITALOCEAN_TOKEN: ${{ secrets.DO_ACCESS_TOKEN }}
       ENVIRONMENT: ${{ needs.load-env-vars.outputs.ENVIRONMENT }}
       COMPONENT: ${{ needs.load-env-vars.outputs.COMPONENT }}

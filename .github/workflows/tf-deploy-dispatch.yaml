@@ -102,7 +102,8 @@ jobs:
       # Step 3: Install Terragrunt
       - name: Install Terragrunt
         run: |
-          TERRAGRUNT_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r '.tag_name' | sed 's/v//')
+          # Pin to v0.84.1 (last version before AWS SDK v2 breaking changes)
+          TERRAGRUNT_VERSION="0.84.1"
           curl -L -o /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod +x /usr/local/bin/terragrunt
 

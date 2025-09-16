@@ -40,7 +40,7 @@ jobs:
           fi
 
     - name: Run chart-testing (lint)
-      run: ct lint --debug --config ./.github/configs/ct.yaml --lint-conf ./.github/configs/lintconf.yaml
+      run: ct lint --debug --config ./.github/configs/ct.yaml --lint-conf ./.github/configs/lintconf.yaml | tee -a helm-test.log
 
     - name: Create kind cluster
       if: steps.list-changed.outputs.changed == 'true'

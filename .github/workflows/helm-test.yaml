@@ -40,7 +40,9 @@ jobs:
           fi
 
     - name: Run chart-testing (lint)
-      run: ct lint --debug --config ./.github/configs/ct.yaml --lint-conf ./.github/configs/lintconf.yaml | tee -a helm-test.log
+      run: |
+        set -o pipefail
+        ct lint --debug --config ./.github/configs/ct.yaml --lint-conf ./.github/configs/lintconf.yaml | tee -a helm-test.log
 
     - name: Create kind cluster
       if: steps.list-changed.outputs.changed == 'true'
@@ -48,20 +50,27 @@ jobs:
       with:
         version: v0.12.0
         node_image: kindest/node:v1.23.5
+
     - name: Install Argo Rollouts
       run: |
         kubectl create namespace argo-rollouts || true
         kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+
     - name: Wait for Argo Rollouts to be ready
       run: |
         kubectl wait --for=condition=available --timeout=120s deployment/argo-rollouts -n argo-rollouts
+
     - name: Run chart-testing (install)
-      if: steps.list-changed.outputs.changed == 'true'    
-      run: ct install --config .github/configs/ct.yaml | tee helm-test.log
-      
+      if: steps.list-changed.outputs.changed == 'true'
+      run: |
+        set -o pipefail
+        ct install --config .github/configs/ct.yaml | tee helm-test.log
+
     - name: Run chart-testing (upgrade)
-      if: steps.list-changed.outputs.changed == 'true'    
-      run: ct install --upgrade --config .github/configs/ct.yaml | tee -a helm-test.log
+      if: steps.list-changed.outputs.changed == 'true'
+      run: |
+        set -o pipefail
+        ct install --upgrade --config .github/configs/ct.yaml | tee -a helm-test.log
 
     - name: Upload logs
       if: failure()

@@ -20,21 +20,23 @@ on:
 jobs:
   get-logs:
     runs-on: ubuntu-latest
+
     outputs:
       logs: ${{ steps.read_logs.outputs.logs }}
+
     steps:
       - name: Download logs artifact
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ inputs.run_id }}
           name: ${{ inputs.artifact_name }}
-          path: ./logs
+          path: ${{ inputs.log_file_path }}
           search_artifacts: true
 
       - name: Read logs
         id: read_logs
         run: |
-          LOG_FILE=./logs/${{ inputs.log_file_path }}
+          LOG_FILE=${{ inputs.log_file_path }}/${{ inputs.log_file_path }}
           if [ -f "$LOG_FILE" ]; then
             echo "logs<<EOF" >> $GITHUB_OUTPUT
             cat "$LOG_FILE" >> $GITHUB_OUTPUT

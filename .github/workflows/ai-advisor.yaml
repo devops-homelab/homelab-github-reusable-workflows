@@ -1,10 +1,23 @@
 name: AI Helm Failure Advisor
 
 on:
-  workflow_run:
-    workflows: ["Chart-Test"]
-    types:
-      - completed
+  workflow_call:
+    inputs:
+      system_prompt:
+        description: 'System prompt to guide the AI behavior.'
+        required: true
+        type: string
+      user_prompt:
+        description: 'User prompt including context like logs or error messages.'
+        required: true
+        type: string
+    secrets:
+      OPENAI_API_KEY:
+        required: true
+        description: 'OpenAI API Key for accessing GPT models.'
+      GH_PAT:
+        required: true
+        description: 'GitHub Personal Access Token for commenting on PRs.'
 
 jobs:
   ai-helm-advisor:

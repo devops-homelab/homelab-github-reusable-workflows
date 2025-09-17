@@ -13,6 +13,10 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+  actions: read
+  
 jobs:
   get-logs:
     runs-on: ubuntu-latest

@@ -29,11 +29,14 @@ jobs:
         uses: Just-Moh-it/openai@v0.0.1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          openai-mode: "completion"
+          openai-mode: "chat"
           openai-params: |
             {
-              "prompt": "${{ inputs.system_prompt }}\n${{ inputs.user_prompt }}",
-              "model": "gpt-4o"
+              "model": "gpt-4o",
+              "messages": [
+                {"role": "system", "content": "${{ inputs.system_prompt }}"},
+                {"role": "user", "content": "${{ inputs.user_prompt }}"}
+              ]
             }
         id: openai
         # id: ai

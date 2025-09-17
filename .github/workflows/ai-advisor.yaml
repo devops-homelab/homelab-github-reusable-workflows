@@ -25,27 +25,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Download workflow logs
-      #   uses: dawidd6/action-download-artifact@v2
-      #   with:
-      #     run_id: ${{ github.event.workflow_run.id }}
-      #     name: logs
-      #     path: helm-test.log
-      #     search_artifacts: true
-          
-      # - name: Read logs
-      #   id: read_logs
-      #   run: |
-      #     LOG_FILE=./logs/helm-test.log
-      #     if [ -f "$LOG_FILE" ]; then
-      #       LOGS=$(cat "$LOG_FILE")
-      #       echo "logs<<EOF" >> $GITHUB_OUTPUT
-      #       echo "$LOGS" >> $GITHUB_OUTPUT
-      #       echo "EOF" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "logs=No logs found." >> $GITHUB_OUTPUT
-      #     fi
-
       - name: Query AI for suggestion
         id: ai
         env:
@@ -68,6 +47,7 @@ jobs:
           echo "suggestion<<EOF" >> $GITHUB_OUTPUT
           echo "$SUGGESTION" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          echo "$SUGGESTION"
 
       - name: Comment on PR
         if: ${{ github.event.workflow_run.pull_requests[0].number }}

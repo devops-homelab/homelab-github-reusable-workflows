@@ -29,17 +29,23 @@ jobs:
         id: ai
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SYSTEM_PROMPT: "${{ inputs.system_prompt }}"
+          USER_PROMPT: "${{ inputs.user_prompt }}"
         run: |
-          SYSTEM_PROMPT="${{ inputs.system_prompt }}"
-          USER_PROMPT="${{ inputs.user_prompt }}"
-          PAYLOAD=$(jq -n \
-            --arg sys "$SYSTEM_PROMPT" \
-            --arg user "$USER_PROMPT" \
-            '{model: "gpt-4o", messages: [{role: "system", content: $sys}, {role: "user", content: $user}]}' )
+
           RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "$PAYLOAD")
+            -d @- <<EOF
+          {
+            "model": "gpt-4o",
+            "messages": [
+              {"role": "system", "content": "$SYSTEM_PROMPT"},
+              {"role": "user", "content": "$USER_PROMPT"}
+            ]
+          }
+          EOF
+          )
           echo "---DEBUG: Full OpenAI API response---"
           echo "$RESPONSE"
           SUGGESTION=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')

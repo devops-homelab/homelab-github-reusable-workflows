@@ -31,7 +31,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           SYSTEM_PROMPT="${{ inputs.system_prompt }}"
-          USER_PROMPT="${{ inputs.user_prompt }}"
+          read -r -d '' USER_PROMPT <<'EOF'
+          ${{ inputs.user_prompt }}
+          EOF
           PAYLOAD=$(jq -n \
             --arg sys "$SYSTEM_PROMPT" \
             --arg user "$USER_PROMPT" \

@@ -37,8 +37,8 @@ jobs:
           {
             "model": "gpt-4o",
             "messages": [
-              {"role": "system", "content": "${{ inputs.system_prompt }}"},
-              {"role": "user", "content": "${{ inputs.user_prompt }}"}
+              {"role": "system", "content": "hi"},
+              {"role": "user", "content": "hi"}
             ]
           }
           EOF

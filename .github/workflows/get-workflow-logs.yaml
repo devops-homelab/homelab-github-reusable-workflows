@@ -38,6 +38,9 @@ jobs:
         run: |
           LOG_FILE=${{ inputs.log_file_path }}/${{ inputs.log_file_path }}
           if [ -f "$LOG_FILE" ]; then
+            echo "--- LOG FILE CONTENTS ---"
+            cat "$LOG_FILE"
+            echo "--- END LOG FILE CONTENTS ---"
             echo "logs<<EOF" >> $GITHUB_OUTPUT
             cat "$LOG_FILE" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT

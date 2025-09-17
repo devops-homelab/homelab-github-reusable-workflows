@@ -1,0 +1,71 @@
+name: AI Helm Failure Advisor
+
+on:
+  workflow_run:
+    workflows: ["Chart-Test"]
+    types:
+      - completed
+
+jobs:
+  ai-helm-advisor:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download workflow logs
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: logs
+          path: helm-test.log
+          search_artifacts: true
+          
+      - name: Read logs
+        id: read_logs
+        run: |
+          LOG_FILE=./logs/helm-test.log
+          if [ -f "$LOG_FILE" ]; then
+            LOGS=$(cat "$LOG_FILE")
+            echo "logs<<EOF" >> $GITHUB_OUTPUT
+            echo "$LOGS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "logs=No logs found." >> $GITHUB_OUTPUT
+          fi
+
+      - name: Query AI for suggestion
+        id: ai
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+            {
+              "model": "gpt-4o",
+              "messages": [
+                {"role": "system", "content": "${{ inputs.system_prompt }}"},
+                {"role": "user", "content": "${{ inputs.user_prompt }}"}
+              ]
+            }
+            EOF
+            )
+          SUGGESTION=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+          echo "suggestion<<EOF" >> $GITHUB_OUTPUT
+          echo "$SUGGESTION" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR
+        if: ${{ github.event.workflow_run.pull_requests[0].number }}
+        uses: peter-evans/create-or-update-comment@v4
+        env:
+          token: ${{ secrets.GH_PAT }}
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          token: ${{ env.token }}
+          body: |
+            :robot: **AI Helm Chart Failure Suggestion**
+            ```
+            ${{ steps.ai.outputs.suggestion }}
+            ```

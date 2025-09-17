@@ -43,7 +43,11 @@ jobs:
           }
           EOF
           )
+          echo "---DEBUG: Full OpenAI API response---"
+          echo "$RESPONSE"
           SUGGESTION=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+          echo "---DEBUG: Parsed suggestion---"
+          echo "$SUGGESTION"
           echo "suggestion<<EOF" >> $GITHUB_OUTPUT
           echo "$SUGGESTION" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

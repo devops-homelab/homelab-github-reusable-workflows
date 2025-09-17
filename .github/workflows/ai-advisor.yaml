@@ -30,15 +30,9 @@ jobs:
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           openai-mode: "chat"
-          openai-params: |
-            {
-              "model": "gpt-4o",
-              "messages": [
-                {"role": "system", "content": "${{ inputs.system_prompt }}"},
-                {"role": "user", "content": "${{ inputs.user_prompt }}"}
-              ]
-            }
+          openai-params: '{"prompt":"Repeat after me, Hello World: }}", "model": "gpt-4o"}'
         id: openai
+
         # id: ai
         # env:
         #   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

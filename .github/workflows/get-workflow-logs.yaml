@@ -1,0 +1,44 @@
+name: Get Workflow Logs
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        required: true
+        type: string
+      log_file_path:
+        required: true
+        type: string
+      run_id:
+        required: true
+        type: string
+    outputs:
+      logs:
+        description: "The content of the log file"
+        value: ${{ jobs.get-logs.outputs.logs }}
+
+jobs:
+  get-logs:
+    runs-on: ubuntu-latest
+    outputs:
+      logs: ${{ steps.read_logs.outputs.logs }}
+    steps:
+      - name: Download logs artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ inputs.run_id }}
+          name: ${{ inputs.artifact_name }}
+          path: ./logs
+          search_artifacts: true
+
+      - name: Read logs
+        id: read_logs
+        run: |
+          LOG_FILE=./logs/${{ inputs.log_file_path }}
+          if [ -f "$LOG_FILE" ]; then
+            echo "logs<<EOF" >> $GITHUB_OUTPUT
+            cat "$LOG_FILE" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "logs=No logs found." >> $GITHUB_OUTPUT
+          fi

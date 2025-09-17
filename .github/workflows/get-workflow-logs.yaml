@@ -12,10 +12,6 @@ on:
       run_id:
         required: true
         type: string
-    outputs:
-      logs:
-        description: "The content of the log file"
-        value: ${{ jobs.get-logs.outputs.logs }}
 
 jobs:
   get-logs:

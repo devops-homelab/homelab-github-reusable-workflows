@@ -47,6 +47,9 @@ jobs:
           printf "%s\n" "$SUGGESTION" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set output for suggestion
         run: |
           git config user.name "GitHub Actions"

@@ -31,7 +31,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           SYSTEM_PROMPT="${{ inputs.system_prompt }}"
-          USER_PROMPT="Error: INSTALLATION FAILED: Service 'common-application-charts-zv64fd9mvi-preview' is invalid: spec.type: Unsupported value: 'loadBalancer': supported values: 'ClusterIP', 'ExternalName', 'LoadBalancer', 'NodePort'"
+          USER_PROMPT="${{ inputs.user_prompt }}"
           PAYLOAD=$(jq -n \
             --arg sys "$SYSTEM_PROMPT" \
             --arg user "$USER_PROMPT" \

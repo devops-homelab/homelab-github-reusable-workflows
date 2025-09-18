@@ -47,6 +47,11 @@ jobs:
           printf "%s\n" "$SUGGESTION" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Set output for suggestion
+        run: |
+          git config user.name "AI Bot"
+          git config user.email "actions@github.com"
+
       - name: Comment on PR
         if: ${{ github.event.workflow_run.pull_requests[0].number }}
         uses: peter-evans/create-or-update-comment@v4

@@ -49,7 +49,7 @@ jobs:
 
       - name: Set output for suggestion
         run: |
-          git config user.name "AI Bot"
+          git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
       - name: Comment on PR

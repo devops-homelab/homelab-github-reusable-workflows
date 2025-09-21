@@ -33,7 +33,7 @@ on:
 jobs:
   load-env-vars:
     name: Load Environment Variables
-    runs-on: ubuntu-latest
+    runs-on: homelab-runner
 
     permissions:
       contents: read

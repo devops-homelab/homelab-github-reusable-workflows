@@ -7,7 +7,7 @@ jobs:
   lint-test:
 
     name: Lint & Test
-    runs-on: homelab-runner
+    runs-on: ubuntu-latest
   
     steps:
     - name: Checkout
